@@ -12,7 +12,6 @@ jobs:
     steps:
 
     - run: |
-        apt-get update && apt-get install -y jq
         echo "Build ${GITHUB_SHA::8}"
 
     - name: Add commit comment
