@@ -7,11 +7,11 @@ on:
 jobs:
   build:
     name: Build
-    if: contains(github.event.comment.html\_url, '/pull/') && contains(github.event.comment.body, 'build')
+    #if: contains(github.event.comment.html\_url, '/pull/') && contains(github.event.comment.body, 'build')
     runs-on: self-hosted
     steps:
 
-    - run: |
+    - run: |  
         echo "Build ${GITHUB_SHA::8}"
 
     - name: Add commit comment
