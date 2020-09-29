@@ -21,32 +21,29 @@ jobs:
               repo: context.repo.repo,
               content: 'rocket'
             })
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: get pullrequest url
-        run: |
-          echo ${{ github.event.issue.pull_request.url }}
-      - name: get upstream branch
-        id: upstreambranch
+      #      - name: Dump GitHub context
+      #        env:
+      #          GITHUB_CONTEXT: ${{ toJson(github) }}
+      #        run: echo "$GITHUB_CONTEXT"
+      #      - name: get pullrequest url
+      #        run: |
+      #          echo ${{ github.event.issue.pull_request.url }}
+      - name: get branch data
+        id: branchdata
         run: |
           echo "::set-output name=branchname::$(curl -v -H "Accept: application/vnd.github.sailor-v-preview+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ github.event.issue.pull_request.url }} | jq '.head.ref' | sed 's/\"//g')"
-      - name: get pull request sha
-        id: pullrequestsha
-        run: |
           echo "::set-output name=sha::$(curl -v -H "Accept: application/vnd.github.sailor-v-preview+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ github.event.issue.pull_request.url }} | jq '.head.sha' | sed 's/\"//g')"
       - name: echo pullrequest branch
         run: |
-          echo ${{ steps.upstreambranch.outputs.branchname }}
-          echo ${{ steps.pullrequestsha.outputs.sha }}
+          echo ${{ steps.branchdata.outputs.branchname }}
+          echo ${{ steps.branchdata.outputs.sha }}
       - name: Checkout upstream repo
         uses: actions/checkout@v2
         with:
-          ref: ${{ steps.upstreambranch.outputs.branchname }}
+          ref: ${{ steps.branchdata.outputs.branchname }}
       - name: Build and tag Docker image
         env:
-          SHA: ${{ steps.pullrequestsha.outputs.sha }}
+          SHA: ${{ steps.branchdata.outputs.sha }}
         run: |
           docker build --file Dockerfile \
             --tag amatas:${SHA::8} \
