@@ -21,12 +21,18 @@ jobs:
               repo: context.repo.repo,
               content: 'rocket'
             })
+      - uses: actions/checkout@v1
+      - name: Build and tag Docker image
+        run: |
+          docker build --file Dockerfile \
+            --tag amatas:${GITHUB_SHA::8} \
+            --tag amatas:latest .
       - name: Add commit comment
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            var msg = "```\nID: " + context.sha + "\n```"
+            var msg = "```\n \"image\" = \"amatas\"\n \"tag\" = \"" + context.sha.substr(0,7) + "\"\n```"
 
             github.issues.createComment({
               issue_number: context.issue.number,
