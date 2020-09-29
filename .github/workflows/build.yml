@@ -39,21 +39,21 @@ jobs:
       - name: echo pullrequest branch
         run: |
           echo ${{ steps.upstreambranch.outputs.branchname }}
-          echo ${{ steps.upstreambranch.outputs.sha }}
+          echo ${{ steps.pullrequestsha.outputs.sha }}
       - name: Checkout upstream repo
         uses: actions/checkout@v2
         with:
           ref: ${{ steps.upstreambranch.outputs.branchname }}
       - name: Build and tag Docker image
         env:
-          SHA: ${{ steps.upstreambranch.outputs.sha }}
+          SHA: ${{ steps.pullrequestsha.outputs.sha }}
         run: |
           docker build --file Dockerfile \
             --tag amatas:${SHA::8} \
             --tag amatas:latest .
       - name: Add commit comment
         env:
-          SHA: ${{ steps.upstreambranch.outputs.sha }}
+          SHA: ${{ steps.pullrequestsha.outputs.sha }}
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
