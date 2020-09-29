@@ -18,7 +18,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            var msg = "ID: GITHUB_SHA"
+            var msg = "ID: " + context.sha
 
             github.issues.createComment({
               issue_number: context.issue.number,
