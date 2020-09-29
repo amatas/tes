@@ -11,14 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup builder
-        run: |
-          echo "Build ${GITHUB_SHA::8}"
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.reactions.createForIssueComment({
+              comment_id: github.event.comment.id
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              content: "rocket"
+            })
       - name: Add commit comment
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            var msg = "ID: " + context.sha
+            var msg = "```\nID: " + context.sha + "\n```"
 
             github.issues.createComment({
               issue_number: context.issue.number,
