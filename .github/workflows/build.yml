@@ -12,6 +12,7 @@ jobs:
     steps:
       - name: Setup builder
         run: |
+          env
           apt install -y jq curl
           echo "Build ${GITHUB_SHA::8}"
       - name: Add commit comment
@@ -20,4 +21,4 @@ jobs:
           curl -sL  -X POST -d @- \
             -H "Content-Type: application/json" \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$GITHUB_SHA/comments"
