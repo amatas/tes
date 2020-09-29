@@ -21,7 +21,10 @@ jobs:
               repo: context.repo.repo,
               content: 'rocket'
             })
-      - uses: actions/checkout@v1
+      - name: Checkout PR code
+        uses: actions/checkout@v2
+          with:
+            ref: ${{ github.event.pull_request.head.sha }}
       - name: Build and tag Docker image
         run: |
           docker build --file Dockerfile \
