@@ -10,29 +10,19 @@ jobs:
     if: contains(github.event.comment.html_url, '/pull/') && contains(github.event.comment.body, 'build')
     runs-on: ubuntu-latest
     steps:
-<<<<<<< HEAD
-
-    - run: |  
-        echo "Build ${GITHUB_SHA::8}"
-
-    - name: Add commit comment
-      run: |
-        jq -nc '{"body": "App built\n```\nID: $GITHUB_SHA\n```\n"}' | \
-        curl -sL  -X POST -d @- \
-          -H "Content-Type: application/json" \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"
-=======
       - name: Setup builder
         run: |
-          env
-          apt install -y jq curl
           echo "Build ${GITHUB_SHA::8}"
       - name: Add commit comment
-        run: |
-          jq -nc '{"body": "App built\n```\nID: $GITHUB_SHA\n```\n"}' | \
-          curl -sL  -X POST -d @- \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$GITHUB_SHA/comments"
->>>>>>> master
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            var msg = "ID: GITHUB_SHA"
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: msg
+            })
