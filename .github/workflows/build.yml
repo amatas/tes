@@ -32,24 +32,33 @@ jobs:
         id: upstreambranch
         run: |
           echo "::set-output name=branchname::$(curl -v -H "Accept: application/vnd.github.sailor-v-preview+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ github.event.issue.pull_request.url }} | jq '.head.ref' | sed 's/\"//g')"
-      - name: echo upstream branch
+      - name: get pull request sha
+        id: pullrequestsha
+        run: |
+          echo "::set-output name=sha::$(curl -v -H "Accept: application/vnd.github.sailor-v-preview+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ github.event.issue.pull_request.url }} | jq '.head.sha' | sed 's/\"//g')"
+      - name: echo pullrequest branch
         run: |
           echo ${{ steps.upstreambranch.outputs.branchname }}
+          echo ${{ steps.upstreambranch.outputs.sha }}
       - name: Checkout upstream repo
         uses: actions/checkout@v2
         with:
           ref: ${{ steps.upstreambranch.outputs.branchname }}
       - name: Build and tag Docker image
+        env:
+          SHA: ${{ steps.upstreambranch.outputs.sha }}
         run: |
           docker build --file Dockerfile \
-            --tag amatas:${GITHUB_SHA::8} \
+            --tag amatas:${SHA::8} \
             --tag amatas:latest .
       - name: Add commit comment
+        env:
+          SHA: ${{ steps.upstreambranch.outputs.sha }}
         uses: actions/github-script@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            var msg = "```\n \"image\" = \"amatas\"\n \"tag\" = \"" + context.sha.substr(0,7) + "\"\n```"
+            var msg = "```\n \"image\" = \"amatas\"\n \"tag\" = \"" + process.env.SHA.substr(0,7) + "\"\n```"
 
             github.issues.createComment({
               issue_number: context.issue.number,
