@@ -21,13 +21,6 @@ jobs:
               repo: context.repo.repo,
               content: 'rocket'
             })
-      #      - name: Dump GitHub context
-      #        env:
-      #          GITHUB_CONTEXT: ${{ toJson(github) }}
-      #        run: echo "$GITHUB_CONTEXT"
-      #      - name: get pullrequest url
-      #        run: |
-      #          echo ${{ github.event.issue.pull_request.url }}
       - name: get branch data
         id: branchdata
         run: |
@@ -55,7 +48,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            var msg = "```\n \"image\" = \"amatas\"\n \"tag\" = \"" + process.env.SHA.substr(0,7) + "\"\n```"
+            var msg = "```\n \"image\" = \"amatas\"\n \"tag\"   = \"" + process.env.SHA.substr(0,7) + "\"\n```"
 
             github.issues.createComment({
               issue_number: context.issue.number,
