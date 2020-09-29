@@ -16,10 +16,10 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             github.reactions.createForIssueComment({
-              comment_id: github.event.comment.id
+              comment_id: context.payload.comment.id,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              content: "rocket"
+              content: 'rocket'
             })
       - name: Add commit comment
         uses: actions/github-script@v3
